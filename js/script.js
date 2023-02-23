@@ -5,6 +5,10 @@ const global = {
         type: 'movie',
         page: 1,
         totalPages: 1
+    }, 
+    api:{
+        apiKey: '01e6aa79cdd7066d6cd557877ab7ac77',
+        apiURL: `https://api.themoviedb.org/3/`
     }
 }
 
@@ -247,7 +251,8 @@ const search = async () => {
     //check to make sure theres a term
     if(global.search.term !== '' && global.search.term !== null) {
         //@todo: make reuest and display results
-
+        const results = await searchAPIData();
+        console.log(results)
     }else{
         showAlert('Please enter a search term')
     }
@@ -304,8 +309,8 @@ const search = async () => {
 
 //fetch data from TMDB API
 const fetchAPIData = async (endpoint) => {
-    const API_KEY = '01e6aa79cdd7066d6cd557877ab7ac77'
-    const API_URL = `https://api.themoviedb.org/3/`;
+    const API_KEY = global.api.apiKey
+    const API_URL = global.api.apiURL
 
     const response = await fetch(`${API_URL}${endpoint}?api_key=${API_KEY}&language=en-US`);
     showSpinner();
@@ -314,6 +319,21 @@ const fetchAPIData = async (endpoint) => {
     hideSpinner();
     return data
 }
+
+//search api data request
+const searchAPIData = async () => {
+    const API_KEY = global.api.apiKey
+    const API_URL = global.api.apiURL
+
+    const response = await fetch(`${API_URL}search/${global.search.type}?api_key=${API_KEY}&language=en-US&query=${global.search.term}`);
+    showSpinner();
+    //get data
+    const data = await response.json();
+    hideSpinner();
+    return data
+}
+
+
 //spinner
 const showSpinner = () => { 
     document.querySelector('.spinner').classList.add('show');
