@@ -273,6 +273,11 @@ const search = async () => {
  }
 
  const displaySearchResults = (results) => { 
+    //clear previous results
+    document.querySelector('#search-results').innerHTML = '';
+    document.querySelector('#search-results-heading').innerHTML = '';
+    document.querySelector('#pagination').innerHTML = '';
+
     results.forEach(result => {
         const div = document.createElement('div');
         div.classList.add('card');
@@ -328,6 +333,19 @@ const search = async () => {
         if(global.search.page === global.search.total_pages) {
             document.querySelector('#next').disabled = true;
         }
+
+        //next page
+        document.querySelector('#next').addEventListener('click', async () => {
+            global.search.page++;
+            const {results, total_pages} = await searchAPIData();
+            displaySearchResults(results);
+        })
+        //prev page
+        document.querySelector('#prev').addEventListener('click', async () => {
+            global.search.page--;
+            const {results, total_pages} = await searchAPIData();
+            displaySearchResults(results);
+        })
     }
 
 
@@ -398,7 +416,7 @@ const searchAPIData = async () => {
     const API_KEY = global.api.apiKey
     const API_URL = global.api.apiURL
 
-    const response = await fetch(`${API_URL}search/${global.search.type}?api_key=${API_KEY}&language=en-US&query=${global.search.term}`);
+    const response = await fetch(`${API_URL}search/${global.search.type}?api_key=${API_KEY}&language=en-US&query=${global.search.term}&page=${global.search.page}`);
     showSpinner();
     //get data
     const data = await response.json();
