@@ -1,5 +1,11 @@
 const global = {
     currentPage : window.location.pathname,
+    search:{
+        term: '',
+        type: 'movie',
+        page: 1,
+        totalPages: 1
+    }
 }
 
 const displayPopularMovies = async () => { 
@@ -231,6 +237,22 @@ if(type === 'movie') {
 
    
  }
+//search movies and shows
+const search = async () => { 
+    const queryString = window.location.search;
+   //use urlserach param to parse url
+   const urlParams = new URLSearchParams(queryString);
+   global.search.type = urlParams.get('type');
+    global.search.term = urlParams.get('search-term');
+    //check to make sure theres a term
+    if(global.search.term !== '' && global.search.term !== null) {
+        //@todo: make reuest and display results
+
+    }else{
+        showAlert('Please enter a search term')
+    }
+ }
+
 
 
  //display slider movies
@@ -311,6 +333,19 @@ const highlightActiveLink = () => {
     });
  }
 
+ //show alert
+ const showAlert = (message, className) => { 
+    const alertEl = document.createElement('div');
+    alertEl.classList.add('alert', className);
+    alertEl.appendChild(document.createTextNode(message));
+    document.querySelector('#alert').appendChild(alertEl);
+
+    setTimeout(() => {
+        alertEl.remove();
+    }
+    , 3000);
+  }
+
  //function to add commas
  const addCommasToNumber = (number) => { 
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -338,7 +373,7 @@ const init = () => {
         displayShowDetails();
         break;
         case '/search.html':
-        console.log('Search');
+        search()
         break;
     }
  }
