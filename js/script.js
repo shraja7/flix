@@ -4,7 +4,8 @@ const global = {
         term: '',
         type: 'movie',
         page: 1,
-        totalPages: 1
+        totalPages: 1,
+        totalResults: 0
     }, 
     api:{
         apiKey: '01e6aa79cdd7066d6cd557877ab7ac77',
@@ -251,7 +252,10 @@ const search = async () => {
     //check to make sure theres a term
     if(global.search.term !== '' && global.search.term !== null) {
         //@todo: make reuest and display results
-        const {results, total_pages, page} = await searchAPIData();
+        const {results, total_pages, page, total_results} = await searchAPIData();
+        global.search.page = page;
+        global.search.total_pages = total_pages;
+        global.search.total_results = total_results;
         //check if results are found
         if(results.length === 0){
             showAlert(' No results found', 'error')
@@ -297,6 +301,7 @@ const search = async () => {
       
         
         `
+        document.querySelector('#search-results-heading').innerHTML = `<h2>${results.length} of ${global.search.total_results} Results for ${global.search.term}</h2>`;
         document.querySelector('#search-results').appendChild(div);
     });
 
