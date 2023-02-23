@@ -304,8 +304,31 @@ const search = async () => {
         document.querySelector('#search-results-heading').innerHTML = `<h2>${results.length} of ${global.search.total_results} Results for ${global.search.term}</h2>`;
         document.querySelector('#search-results').appendChild(div);
     });
-
+    //display pagination
+    displayPagination()
   }
+
+  //create and display pagination for search results
+    const displayPagination = () => {
+        //create div element
+        const div = document.createElement('div');
+        div.classList.add('pagination');
+        div.innerHTML = `
+        <button class="btn btn-primary" id="prev">Prev</button>
+          <button class="btn btn-primary" id="next">Next</button>
+          <div class="page-counter">Page ${global.search.page} of ${global.search.totalPages}</div>`
+        document.querySelector('#pagination').appendChild(div);
+
+        //disable previous button if on page 1
+        if(global.search.page === 1) {
+            document.querySelector('#prev').disabled = true;
+        }
+
+        //disbalbe next button if on last page
+        if(global.search.page === global.search.total_pages) {
+            document.querySelector('#next').disabled = true;
+        }
+    }
 
 
  //display slider movies
