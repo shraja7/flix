@@ -84,9 +84,9 @@ const displayPopularMovies = async () => {
  //display movie details
  const displayMovieDetails = async () => { 
     //get id and split to get the id
-    const movieID = window.location.search.split('=')[1];
+    const movieId = window.location.search.split('=')[1];
 
-    const movie = await fetchAPIData(`movie/${movieID}`);
+    const movie = await fetchAPIData(`movie/${movieId}`);
 
     //overalay for background image
     displayBackgroundImage('movie', movie.backdrop_path)
@@ -251,13 +251,56 @@ const search = async () => {
     //check to make sure theres a term
     if(global.search.term !== '' && global.search.term !== null) {
         //@todo: make reuest and display results
-        const results = await searchAPIData();
-        console.log(results)
+        const {results, total_pages, page} = await searchAPIData();
+        //check if results are found
+        if(results.length === 0){
+            showAlert(' No results found', 'error')
+            return
+
+        }
+
+        //display results
+        displaySearchResults(results, total_pages, page);
+        //clear inputs
+        document.querySelector('#search-term').value = '';
     }else{
         showAlert('Please enter a search term')
     }
  }
 
+ const displaySearchResults = (results) => { 
+    results.forEach(result => {
+        const div = document.createElement('div');
+        div.classList.add('card');
+        div.innerHTML = `
+        
+        <a href="${global.search.type}-details.html?id=${result.id}">
+         ${
+            result.poster_path ?
+            ` <img
+            src="https://image.tmdb.org/t/p/w500/${result.poster_path}"
+            class="card-img-top"
+            alt="${global.search.type === 'movie' ? result.title : result.name}"
+          />` : ` <img
+          src="images/no-image.jpg"
+          class="card-img-top"
+          alt="${global.search.type === 'movie' ? result.title : result.name}"
+        />`
+         }
+        </a>
+        <div class="card-body">
+          <h5 class="card-title">${global.search.type === 'movie' ? result.title : result.name}</h5>
+          <p class="card-text">
+            <small class="text-muted">Release:${global.search.type === 'movie' ? result.release_date : result.first_air_date}</small>
+          </p>
+        </div>
+      
+        
+        `
+        document.querySelector('#search-results').appendChild(div);
+    });
+
+  }
 
 
  //display slider movies
@@ -311,9 +354,11 @@ const search = async () => {
 const fetchAPIData = async (endpoint) => {
     const API_KEY = global.api.apiKey
     const API_URL = global.api.apiURL
-
-    const response = await fetch(`${API_URL}${endpoint}?api_key=${API_KEY}&language=en-US`);
     showSpinner();
+    const response = await fetch(
+        `${API_URL}${endpoint}?api_key=${API_KEY}&language=en-US`
+      );
+    
     //get data
     const data = await response.json();
     hideSpinner();
@@ -354,7 +399,7 @@ const highlightActiveLink = () => {
  }
 
  //show alert
- const showAlert = (message, className) => { 
+ const showAlert = (message, className = 'error') => { 
     const alertEl = document.createElement('div');
     alertEl.classList.add('alert', className);
     alertEl.appendChild(document.createTextNode(message));
